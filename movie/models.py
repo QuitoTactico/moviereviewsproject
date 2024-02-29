@@ -11,3 +11,10 @@ class Movie(models.Model):
     image = models.ImageField(upload_to='movies/images/')
     # Es un campo opcional
     url = models.URLField(blank=True)
+    genre = models.CharField(blank=True, max_length=250)
+    year = models.IntegerField(blank=True, null=True)
+
+    # le definimos una forma de convertir este objeto a string
+    # hicimos algo parecido con Edison, que recuerdos
+    def __str__(self):
+        return self.title
