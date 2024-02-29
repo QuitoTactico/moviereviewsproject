@@ -45,8 +45,14 @@ def statistics_view(request):
     matplotlib.use('Agg')
     # Obtiene todos los años de las películas
     years = Movie.objects.values_list('year', flat=True).distinct().order_by('year')
+
+
+    # Obtiene todos los géneros de las películas, pero no el primero
+    #genres = Movie.objects.values_list('genre', flat=True).distinct().order_by('genre')
+    
     #diccionario para almacenar el conteo de películas por año
     movie_counts_by_year = {}
+    movie_counts_by_genre = {}
 
     # Cuenta las películas por año
     for year in years:
@@ -59,10 +65,55 @@ def statistics_view(request):
         count = movies_in_year.count()
         movie_counts_by_year[year] = count
 
-    bar_width = 0.5
-    bar_spacing = 0.5
-    bar_positions = range(len(movie_counts_by_year)) # Posiciones
+    # Tocó de esta forma
 
+    movies = Movie.objects.all()
+
+    for movie in movies:
+        first_genre = movie.genre.split(",")[0].strip()
+        
+        if first_genre not in movie_counts_by_genre:
+            movie_counts_by_genre[first_genre] = 0
+        movie_counts_by_genre[first_genre] += 1
+    '''
+    for genre in genres:
+        if genre:
+            movies_in_genre = Movie.objects.filter(genre=genre)
+        else:
+            movies_in_genre = Movie.objects.filter(genre__isnull=True)
+            genre = 'None'
+
+        count = movies_in_genre.count()
+        movie_counts_by_genre[genre] = count
+    '''
+
+    bar_width = 0.5
+    bar_spacing = 0.5  # de hecho nunca se usó XD
+    bar_positions_year = range(len(movie_counts_by_year)) # Posiciones
+    bar_positions_genre = range(len(movie_counts_by_genre))
+
+    # Tuve que usar subplots               10, 10
+    fig, axs = plt.subplots(1, 2, figsize=(12, 5))
+
+    # Gráfica de películas por año
+    axs[0].bar(bar_positions_year, movie_counts_by_year.values(), bar_width, align='center')
+    axs[0].set_title('Movies per Year')
+    axs[0].set_xlabel('Year')
+    axs[0].set_ylabel('Number of Movies')
+    axs[0].set_xticks(bar_positions_year)
+    axs[0].set_xticklabels(movie_counts_by_year.keys(), rotation=90)
+
+    # Gráfica de películas por género
+    axs[1].bar(bar_positions_genre, movie_counts_by_genre.values(), bar_width, align='center')
+    axs[1].set_title('Movies per Genre')
+    axs[1].set_xlabel('Genre')
+    axs[1].set_ylabel('Number of Movies')
+    axs[1].set_xticks(bar_positions_genre)
+    axs[1].set_xticklabels(movie_counts_by_genre.keys(), rotation=90)
+
+    plt.tight_layout()
+
+    '''
     plt.bar(bar_positions, movie_counts_by_year.values(), bar_width, align='center')
     
     plt.title('Movies per Year')
@@ -72,6 +123,7 @@ def statistics_view(request):
 
     # espaciado entre barras
     plt.subplots_adjust(bottom=0.3)
+    '''
 
     # Guardar la imagen en un buffer (BytesIO)
     buffer = io.BytesIO()
@@ -87,3 +139,5 @@ def statistics_view(request):
 
     # Y ya te deja renderizarlo
     return render(request, 'statistics.html', {'graphic': graphic})
+
+
