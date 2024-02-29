@@ -3,9 +3,9 @@
 </head>
 
 <div class = "container">
+    <!--
     <h1>Welcome to Home Page, <span style="color:red;">{{name}}</span></h1>
-
-
+    -->
 
     <form action ="">
         <div class="mb-3">
@@ -25,6 +25,16 @@
                 <div class="card-body">
                     <h5 class="card-title fw-bold">{{ movie.title }}</h5> 
                     <p class="card-text">{{ movie.description }}</p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            {{ movie.genre }}
+                        </small>
+                    </p>
+                    <p class="card-text muted-text">
+                        <small class="text-muted">
+                            {{ movie.year }}
+                        </small>
+                    </p>
                     {% if movie.url %}
                     <a href="{{ movie.url }}"> 
                         Movie Link 
